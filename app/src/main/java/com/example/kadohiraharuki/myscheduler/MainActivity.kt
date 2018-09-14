@@ -5,19 +5,34 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import io.realm.Realm
+import io.realm.kotlin.where
 
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity() {
+    //lateinit修飾子でrealmはonCreateメソッドで初期化
+    private lateinit var realm: Realm
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        //Realmオブジェクトを取得する
+        //RealmクラスのgetDefaultInstanceメソッドでRealmクラスのインスタンスを初期化
+        realm = Realm.getDefaultInstance()
+
+        //Realmインスタンスからデータを取得するクエリを発行する
+        val schedules = realm.where<Schedule>().findAll()
+        //(listView二つインポート選択肢あり)、取得した全てのスケジュールをScheduleAdapterクラスのコンストラクタに渡し、リストビューに設定
+        listView.adapter = ScheduleAdapter(schedules)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            //ScheduleEditActivityへの画面遷移の設定
+            startActivity<ScheduleEditActivity>()
         }
     }
 
@@ -35,5 +50,12 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    //アクティビティの終了処理
+    //ライフサイクル（アクティビティーが生成されてから終了されるまでの状態）であるonDestroyメソッドをオーバーライドしてcloseメソッドでRealmのインスタンスを破棄しリソースの開放
+    override fun onDestroy() {
+        super.onDestroy()
+    realm.close()
     }
 }
