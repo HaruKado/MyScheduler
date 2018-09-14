@@ -34,7 +34,18 @@ class MainActivity : AppCompatActivity() {
             //ScheduleEditActivityへの画面遷移の設定
             startActivity<ScheduleEditActivity>()
         }
+
+            listView.setOnItemClickListener { parent, view, position, id ->
+                //positionをgetItemPositionに渡せば、リスト内の指定された位置にあるデータ、つまりscheduleのインスタンスが取得できる
+                val schedule = parent.getItemAtPosition(position) as Schedule
+                //Scheduleインスタンスからidを取得し、インテントにschedule_idとして格納することでidをScheduleEditActivitに渡す
+                startActivity<ScheduleEditActivity>("schedule_id" to schedule.id)
+
+            }
     }
+
+
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
